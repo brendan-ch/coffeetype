@@ -211,7 +211,7 @@ class LongPollingManager extends Thread {
 public class NetworkManager {
   public static final String BASE_URL = "http://localhost:3000";
   public static final int MAX_LISTENERS = 10;
-  public static final int MAX_PLAYERS = 10;
+  public static final int MAX_PLAYERS = 8;
   
   private String roomKey;
   private String playerId;
