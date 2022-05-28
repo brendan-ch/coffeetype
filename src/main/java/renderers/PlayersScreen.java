@@ -41,6 +41,9 @@ public class PlayersScreen implements CustomComponent {
   private int numListeners;
 
   public PlayersScreen(NetworkManager networkManager) {
+    this.listeners = new EventListener[MAX_LISTENERS];
+    this.numListeners = 0;
+    
     this.networkManager = networkManager;
     this.countdownValue = COUNTDOWN_VALUE;
 
