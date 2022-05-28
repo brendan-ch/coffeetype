@@ -165,6 +165,15 @@ public class PlayersScreen implements CustomComponent {
     if (isHost) {
       // Add start button
       JButton startButton = new JButton("Start");
+
+      class StartButtonListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+          // Start the test
+          networkManager.startTest();
+        }
+      }
+      startButton.addActionListener(new StartButtonListener());
+
       buttonWrapper.add(startButton);
     } else {
       // Add waiting text

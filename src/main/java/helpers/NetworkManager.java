@@ -38,10 +38,11 @@ class TestUpdateManager extends Thread {
   private String roomKey;
   private String playerId;
 
-  public TestUpdateManager(String roomKey, String playerId, HttpClient client) {
+  public TestUpdateManager(String roomKey, String playerId, HttpClient client, String typed) {
     this.roomKey = roomKey;
     this.playerId = playerId;
     this.client = client;
+    this.typed = typed;
   }
 
   @Override
@@ -77,6 +78,7 @@ class TestUpdateManager extends Thread {
     body.put("playerId", this.playerId);
     body.put("roomKey", this.roomKey);
     body.put("typed", this.typed);
+    System.out.println(body);
 
     // Build a new request
     HttpRequest request = HttpRequest.newBuilder(
@@ -371,6 +373,42 @@ public class NetworkManager {
     }
   }
 
+  public void startTest() {
+    if (roomKey == null || playerId == null) return;
+
+    // Build the request body
+    JSONObject body = new JSONObject();
+    body.put("roomKey", this.roomKey);
+    body.put("playerId", this.playerId);
+
+    // Send a HTTP request to create a room
+    HttpRequest request = HttpRequest.newBuilder(
+      URI.create(BASE_URL + "/api/post/start")
+    )
+      .header("accept", "application/json")
+      .header("content-type", "application/json")
+      .POST(BodyPublishers.ofString(body.toString()))
+      .build();
+
+    CompletableFuture<HttpResponse<String>> future = client.sendAsync(request, BodyHandlers.ofString());
+
+    JSONParser parser = new JSONParser();
+
+    try {
+      JSONObject result = (JSONObject) parser.parse(future.get().body());
+
+      if (!((Boolean) result.get("success"))) {
+        return;
+      }
+    } catch(InterruptedException e) {
+
+    } catch(ExecutionException e) {
+      
+    } catch(ParseException e) {
+
+    }
+  }
+
   public void initializeLongPolling() {
     if (this.longPollingManager != null) return;
 
@@ -409,7 +447,7 @@ public class NetworkManager {
   public void initializeTestUpdates() {
     if (this.testUpdateManager != null) return;
 
-    this.testUpdateManager = new TestUpdateManager(roomKey, playerId, client);
+    this.testUpdateManager = new TestUpdateManager(roomKey, playerId, client, typed);
     this.testUpdateManager.start();
   }
 
