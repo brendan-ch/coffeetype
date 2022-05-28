@@ -59,7 +59,7 @@ public class PlayersScreen implements CustomComponent {
         if (e.EVENT_TYPE == Event.NETWORK_TEST_START) {
           // Begin countdown
           countdown.start();
-        } else if (e.EVENT_TYPE == Event.NETWORK_PLAYERS_UPDATE) {
+        } else if (e.EVENT_TYPE == Event.NETWORK_PLAYERS_UPDATE || e.EVENT_TYPE == Event.NETWORK_STATUS_CHANGE) {
           // System.out.println("Re-rendering player list");
           // Re-render player list
           render();

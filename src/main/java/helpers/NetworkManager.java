@@ -303,9 +303,14 @@ public class NetworkManager {
     try {
       JSONObject result = (JSONObject) parser.parse(future.get().body());
 
+      if (!((Boolean) result.get("success"))) {
+        return;
+      }
+
       // Set room key and player ID
       this.roomKey = (String) result.get("roomKey");
       this.playerId = (String) result.get("playerId");
+      this.players = (JSONArray) ((JSONObject) result.get("data")).get("players");
 
       fireEventListeners(new Event(Event.NETWORK_STATUS_CHANGE));
 
@@ -345,9 +350,14 @@ public class NetworkManager {
     try {
       JSONObject result = (JSONObject) parser.parse(future.get().body());
 
+      if (!((Boolean) result.get("success"))) {
+        return;
+      }
+
       // Set room key and player ID
       this.roomKey = (String) result.get("roomKey");
       this.playerId = (String) result.get("playerId");
+      this.players = (JSONArray) ((JSONObject) result.get("data")).get("players");
 
       fireEventListeners(new Event(Event.NETWORK_STATUS_CHANGE));
 
@@ -370,7 +380,7 @@ public class NetworkManager {
     // Add some event listeners
     class LongPollingListener implements EventListener {
       public void actionPerformed(Event e) {
-        if (e.EVENT_TYPE == Event.NETWORK_PLAYERS_UPDATE) {
+        if (longPollingManager != null && e.EVENT_TYPE == Event.NETWORK_PLAYERS_UPDATE) {
           // Update the JSONObject array
           players = longPollingManager.getPlayers();
         } else if (e.EVENT_TYPE == Event.NETWORK_TEST_START) {
