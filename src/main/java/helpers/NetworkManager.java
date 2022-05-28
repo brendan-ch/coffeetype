@@ -157,10 +157,14 @@ class LongPollingManager extends Thread {
 
     try {
       JSONObject result = (JSONObject) parser.parse(future.get().body());
+
+      if (!((Boolean) result.get("success"))) {
+        return;
+      }
       
       String networkEvent = (String) result.get("event");
-      String[] networkEvents = {"TEST_START", "TEST_END", "WORDS_UPDATE", "NETWORK_PLAYERS_UPDATE"};
-      if (networkEvent.equals("NETWORK_PLAYERS_UPDATE")) {
+      String[] networkEvents = {"TEST_START", "TEST_END", "WORDS_UPDATE", "PLAYERS_UPDATE"};
+      if (networkEvent.equals("PLAYERS_UPDATE") || networkEvent.equals("TEST_END")) {
         // Update the local players array
         this.players = (JSONArray) ((JSONObject) result.get("data")).get("players");
       }
