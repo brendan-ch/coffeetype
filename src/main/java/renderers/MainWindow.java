@@ -98,8 +98,6 @@ public class MainWindow implements CustomComponent {
         } else if (e.EVENT_TYPE == Event.EXIT_MULTIPLAYER_BUTTON_PRESS) {
           // Exit multiplayer
           networkManager.exitRoom();
-          c.show(contentWrapper, WORD_DISPLAY);
-          wordDisplay.render();
         }
       }
     }
@@ -159,7 +157,7 @@ public class MainWindow implements CustomComponent {
     this.contentWrapper.add(multiplayerScreen.getPanel());
 
     this.playersScreen = new PlayersScreen(this.networkManager);
-    c.addLayoutComponent(this.multiplayerScreen.getPanel(), PLAYER_SCREEN);
+    c.addLayoutComponent(this.playersScreen.getPanel(), PLAYER_SCREEN);
     this.contentWrapper.add(playersScreen.getPanel());
 
     class ResultsScreenListener implements EventListener {
@@ -204,6 +202,28 @@ public class MainWindow implements CustomComponent {
     }
     this.stats.addEventListener(new StatsEventListener(c));
     this.panel.add(this.contentWrapper);
+
+    class NetworkManagerListener implements EventListener {
+      private CardLayout c;
+
+      public NetworkManagerListener(CardLayout c) {
+        this.c = c;
+      }
+
+      public void actionPerformed(Event e) {
+        // If connected, switch to player screen
+        if (e.EVENT_TYPE == Event.NETWORK_STATUS_CHANGE) {
+          if (networkManager.getConnectionStatus()) {
+            c.show(contentWrapper, PLAYER_SCREEN);
+          } else {
+            c.show(contentWrapper, WORD_DISPLAY);
+            wordDisplay.render();
+          }
+        }
+      }
+    }
+
+    networkManager.addEventListener(new NetworkManagerListener(c));
   }
 
   public JPanel getPanel() {
