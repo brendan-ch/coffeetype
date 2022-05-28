@@ -137,6 +137,7 @@ public class PlayersScreen implements CustomComponent {
     int labelIndex = 0;
 
     JSONArray players = this.networkManager.getPlayers();
+    System.out.println(players);
     if (players == null) return;
     
     // Re-render based on players
@@ -164,14 +165,7 @@ public class PlayersScreen implements CustomComponent {
     }
 
     // Add item
-    boolean isHost = false;
-    for (int i = 0; i < players.size(); i++) {
-      // If host
-      if (((Boolean) ((JSONObject) players.get(i)).get("host"))) {
-        isHost = true; 
-      }
-    }
-
+    boolean isHost = networkManager.getIsHost();
     if (isHost) {
       // Add start button
       JButton startButton = new JButton("Start");

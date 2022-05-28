@@ -272,6 +272,22 @@ public class NetworkManager {
     return this.typed;
   }
 
+  public String getPlayerId() {
+    return this.playerId;
+  }
+
+  public boolean getIsHost() {
+    int i = -1;
+    for (int j = 0; j < players.size(); j++) {
+      if (((JSONObject) players.get(j)).get("id").equals(this.playerId)) {
+        i = j;
+        break;
+      }
+    }
+
+    return (Boolean) ((JSONObject) players.get(i)).get("host");
+  }
+
   public void addLetter(String toAdd) {
     if (this.testUpdateManager == null) return;
 
