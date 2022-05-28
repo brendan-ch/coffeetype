@@ -25,6 +25,7 @@ import helpers.NetworkManager;
 public class PlayersScreen implements CustomComponent {
   public static final String PAGE_TITLE = "Players";
   public static final int COUNTDOWN_VALUE = 5;
+  public static final int MAX_LISTENERS = 5;
 
   private JPanel panel;
   private JLabel[] items;
@@ -36,6 +37,9 @@ public class PlayersScreen implements CustomComponent {
 
   private JPanel buttonWrapper;
 
+  private EventListener[] listeners;
+  private int numListeners;
+
   public PlayersScreen(NetworkManager networkManager) {
     this.networkManager = networkManager;
     this.countdownValue = COUNTDOWN_VALUE;
@@ -46,6 +50,9 @@ public class PlayersScreen implements CustomComponent {
         countdownValue--;
 
         if (countdownValue <= 0) {
+          // Fire event
+          fireEventListeners(new Event(Event.NETWORK_TEST_START_DELAY_END));
+
           // Reset the countdown
           // Switch to the words screen
           resetCountdown();
@@ -188,5 +195,20 @@ public class PlayersScreen implements CustomComponent {
     // Stop the timer
     this.countdown.stop();
     this.countdownValue = COUNTDOWN_VALUE;
+  }
+
+  public void addEventListener(EventListener listener) {
+    if (numListeners < MAX_LISTENERS) {
+      this.listeners[numListeners++] = listener; 
+    }
+  }
+
+  private void fireEventListeners(Event e) {
+    // Pass events up
+    for (EventListener listener : listeners) {
+      if (listener != null) {
+        listener.actionPerformed(e);
+      }
+    }
   }
 }
