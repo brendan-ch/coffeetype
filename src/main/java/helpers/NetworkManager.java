@@ -78,7 +78,7 @@ class TestUpdateManager extends Thread {
     body.put("playerId", this.playerId);
     body.put("roomKey", this.roomKey);
     body.put("typed", this.typed);
-    System.out.println(body);
+    // System.out.println(body);
 
     // Build a new request
     HttpRequest request = HttpRequest.newBuilder(
@@ -117,16 +117,24 @@ class LongPollingManager extends Thread {
   private EventListener[] listeners;
   private int numListeners;
 
+  private String chars;
+
   public LongPollingManager(String roomKey, String playerId, HttpClient client) {
     this.roomKey = roomKey;
     this.playerId = playerId;
     this.client = client;
+
+    this.chars = "";
 
     this.listeners = new EventListener[MAX_LISTENERS];
   }
 
   public JSONArray getPlayers() {
     return this.players;
+  }
+
+  public String getChars() {
+    return this.chars;
   }
   
   @Override
@@ -169,8 +177,9 @@ class LongPollingManager extends Thread {
       if (networkEvent.equals("PLAYERS_UPDATE") || networkEvent.equals("TEST_END")) {
         // Update the local players array
         this.players = (JSONArray) ((JSONObject) result.get("data")).get("players");
+      } else if (networkEvent.equals("TEST_START") || networkEvent.equals("WORDS_UPDATE")) {
+        this.chars = ((String) ((JSONObject) result.get("data")).get("chars"));
       }
-      
 
       for (EventListener listener : listeners) {
         if (listener != null) {
@@ -421,7 +430,10 @@ public class NetworkManager {
         if (longPollingManager != null && e.EVENT_TYPE == Event.NETWORK_PLAYERS_UPDATE) {
           // Update the JSONObject array
           players = longPollingManager.getPlayers();
-        } else if (e.EVENT_TYPE == Event.NETWORK_TEST_START) {
+        } else if (e.EVENT_TYPE == Event.NETWORK_TEST_START || e.EVENT_TYPE == Event.NETWORK_WORDS_UPDATE) {
+          // Set words
+          characters = longPollingManager.getChars();
+
           // Start sending updates
           initializeTestUpdates();
         } else if (e.EVENT_TYPE == Event.NETWORK_TEST_END) {
