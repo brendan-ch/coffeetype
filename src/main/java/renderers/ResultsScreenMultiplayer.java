@@ -115,7 +115,10 @@ public class ResultsScreenMultiplayer implements CustomComponent {
 
         String toAdd = (String) player.get("name");
 
-        // toAdd += ": " + player.get("wpm") + " wpm, " +  player.get("acc") + "%";
+        Number wpm = (Number) player.get("wpm");
+        Number acc = (Number) player.get("acc");
+
+        toAdd += ": " + wpm.intValue() + "wpm, " + acc.intValue() + "%";
 
         this.items[labelIndex].setText(toAdd);
         
