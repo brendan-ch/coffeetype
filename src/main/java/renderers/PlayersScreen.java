@@ -187,6 +187,8 @@ public class PlayersScreen implements CustomComponent {
       waitingText.setBackground(Constants.BACKGROUND);
       buttonWrapper.add(waitingText);
     }
+
+    this.buttonWrapper.validate();
   }
 
   private void resetCountdown() {
