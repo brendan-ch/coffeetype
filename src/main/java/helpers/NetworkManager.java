@@ -157,7 +157,6 @@ class LongPollingManager extends Thread {
 
     try {
       JSONObject result = (JSONObject) parser.parse(future.get().body());
-      System.out.println(result);
       
       String networkEvent = (String) result.get("event");
       String[] networkEvents = {"TEST_START", "TEST_END", "WORDS_UPDATE", "NETWORK_PLAYERS_UPDATE"};
@@ -437,6 +436,9 @@ public class NetworkManager {
       // Remove room key and player ID
       this.roomKey = null;
       this.playerId = null;
+
+      this.stopLongPolling();
+      this.stopTestUpdates();
 
       // Fire event listeners
       fireEventListeners(new Event(Event.NETWORK_STATUS_CHANGE));
