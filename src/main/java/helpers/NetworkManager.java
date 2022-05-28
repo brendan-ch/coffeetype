@@ -430,6 +430,7 @@ public class NetworkManager {
         if (longPollingManager != null && e.EVENT_TYPE == Event.NETWORK_PLAYERS_UPDATE) {
           // Update the JSONObject array
           players = longPollingManager.getPlayers();
+          // System.out.println(players);
         } else if (e.EVENT_TYPE == Event.NETWORK_TEST_START || e.EVENT_TYPE == Event.NETWORK_WORDS_UPDATE) {
           // Set words
           characters = longPollingManager.getChars();
@@ -439,6 +440,9 @@ public class NetworkManager {
         } else if (e.EVENT_TYPE == Event.NETWORK_TEST_END) {
           // Stop sending updates
           stopTestUpdates();
+
+          // Reset the test
+          typed = "";
         }
 
         // Pass events up
