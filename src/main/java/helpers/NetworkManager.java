@@ -284,7 +284,7 @@ public class NetworkManager {
         break;
       }
     }
-    if (index < 0) return false;
+    if (i < 0) return false;
 
     return (Boolean) ((JSONObject) players.get(i)).get("host");
   }
