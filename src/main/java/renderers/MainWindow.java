@@ -14,6 +14,7 @@ public class MainWindow implements CustomComponent {
   // References for the CardLayout manager
   public static final String WORD_DISPLAY = "wordDisplay";
   public static final String RESULTS_SCREEN = "resultsScreen";
+  public static final String RESULTS_SCREEN_MULTIPLAYER = "resultsScreenMultiplayer";
   public static final String STATS_SCREEN = "statsScreen";
   public static final String HISTORY_SCREEN = "historyScreen";
   public static final String SETTINGS_SCREEN = "settingsScreen";
@@ -41,6 +42,7 @@ public class MainWindow implements CustomComponent {
   // Track the different components
   private WordDisplay wordDisplay;
   private ResultsScreen resultsScreen;
+  private ResultsScreenMultiplayer resultsScreenMultiplayer;
   private SettingsScreen settingsScreen;
   private HistoryScreen historyScreen;
   private NavigationBar header;
@@ -98,7 +100,6 @@ public class MainWindow implements CustomComponent {
         } else if (e.EVENT_TYPE == Event.EXIT_MULTIPLAYER_BUTTON_PRESS) {
           // Exit multiplayer
           networkManager.exitRoom();
-          c.show(contentWrapper, WORD_DISPLAY);
         }
       }
     }
@@ -158,8 +159,12 @@ public class MainWindow implements CustomComponent {
     this.contentWrapper.add(multiplayerScreen.getPanel());
 
     this.playersScreen = new PlayersScreen(this.networkManager);
-    c.addLayoutComponent(this.multiplayerScreen.getPanel(), PLAYER_SCREEN);
+    c.addLayoutComponent(this.playersScreen.getPanel(), PLAYER_SCREEN);
     this.contentWrapper.add(playersScreen.getPanel());
+
+    this.resultsScreenMultiplayer = new ResultsScreenMultiplayer(networkManager);
+    c.addLayoutComponent(this.resultsScreenMultiplayer.getPanel(), RESULTS_SCREEN_MULTIPLAYER);
+    this.contentWrapper.add(resultsScreenMultiplayer.getPanel());
 
     class ResultsScreenListener implements EventListener {
       private CardLayout c;
@@ -184,6 +189,23 @@ public class MainWindow implements CustomComponent {
       }
     }
     this.resultsScreen.addEventListener(new ResultsScreenListener(c));
+
+    class PlayersScreenListener implements EventListener {
+      private CardLayout c;
+
+      public PlayersScreenListener(CardLayout c) {
+        this.c = c;
+      }
+
+      public void actionPerformed(Event e) {
+        if (e.EVENT_TYPE == Event.NETWORK_TEST_START_DELAY_END) {
+          // Switch to the words screen
+          c.show(contentWrapper, WORD_DISPLAY);
+          wordDisplay.render();
+        }
+      }
+    }
+    this.playersScreen.addEventListener(new PlayersScreenListener(c));
     
     // Event listener for when test is complete
     class StatsEventListener implements EventListener {
@@ -203,6 +225,47 @@ public class MainWindow implements CustomComponent {
     }
     this.stats.addEventListener(new StatsEventListener(c));
     this.panel.add(this.contentWrapper);
+
+    class NetworkManagerListener implements EventListener {
+      private CardLayout c;
+
+      public NetworkManagerListener(CardLayout c) {
+        this.c = c;
+      }
+
+      public void actionPerformed(Event e) {
+        // If connected, switch to player screen
+        if (e.EVENT_TYPE == Event.NETWORK_STATUS_CHANGE) {
+          if (networkManager.getConnectionStatus()) {
+            c.show(contentWrapper, PLAYER_SCREEN);
+          } else {
+            c.show(contentWrapper, WORD_DISPLAY);
+            wordDisplay.render();
+          }
+        } else if (e.EVENT_TYPE == Event.NETWORK_TEST_END) {
+          // Go to the results screen
+          c.show(contentWrapper, RESULTS_SCREEN_MULTIPLAYER);
+        }
+      }
+    }
+
+    class ResultsScreenMultiplayerListener implements EventListener {
+      private CardLayout c;
+
+      public ResultsScreenMultiplayerListener(CardLayout c) {
+        this.c = c;
+      }
+
+      public void actionPerformed(Event e) {
+        // Switch to the player screen
+        if (e.EVENT_TYPE == Event.NEXT_TEST) {
+          c.show(contentWrapper, PLAYER_SCREEN);
+        }
+      }
+    }
+    this.resultsScreenMultiplayer.addEventListener(new ResultsScreenMultiplayerListener(c));
+
+    networkManager.addEventListener(new NetworkManagerListener(c));
   }
 
   public JPanel getPanel() {

@@ -38,10 +38,11 @@ class TestUpdateManager extends Thread {
   private String roomKey;
   private String playerId;
 
-  public TestUpdateManager(String roomKey, String playerId, HttpClient client) {
+  public TestUpdateManager(String roomKey, String playerId, HttpClient client, String typed) {
     this.roomKey = roomKey;
     this.playerId = playerId;
     this.client = client;
+    this.typed = typed;
   }
 
   @Override
@@ -77,6 +78,7 @@ class TestUpdateManager extends Thread {
     body.put("playerId", this.playerId);
     body.put("roomKey", this.roomKey);
     body.put("typed", this.typed);
+    // System.out.println(body);
 
     // Build a new request
     HttpRequest request = HttpRequest.newBuilder(
@@ -115,16 +117,24 @@ class LongPollingManager extends Thread {
   private EventListener[] listeners;
   private int numListeners;
 
+  private String chars;
+
   public LongPollingManager(String roomKey, String playerId, HttpClient client) {
     this.roomKey = roomKey;
     this.playerId = playerId;
     this.client = client;
+
+    this.chars = "";
 
     this.listeners = new EventListener[MAX_LISTENERS];
   }
 
   public JSONArray getPlayers() {
     return this.players;
+  }
+
+  public String getChars() {
+    return this.chars;
   }
   
   @Override
@@ -157,15 +167,19 @@ class LongPollingManager extends Thread {
 
     try {
       JSONObject result = (JSONObject) parser.parse(future.get().body());
-      System.out.println(result);
-      
-      String networkEvent = (String) result.get("event");
-      String[] networkEvents = {"TEST_START", "TEST_END", "WORDS_UPDATE", "NETWORK_PLAYERS_UPDATE"};
-      if (networkEvent.equals("NETWORK_PLAYERS_UPDATE")) {
-        // Update the local players array
-        this.players = (JSONArray) ((JSONObject) result.get("data")).get("players");
+
+      if (!((Boolean) result.get("success"))) {
+        return;
       }
       
+      String networkEvent = (String) result.get("event");
+      String[] networkEvents = {"TEST_START", "TEST_END", "WORDS_UPDATE", "PLAYERS_UPDATE"};
+      if (networkEvent.equals("PLAYERS_UPDATE") || networkEvent.equals("TEST_END")) {
+        // Update the local players array
+        this.players = (JSONArray) ((JSONObject) result.get("data")).get("players");
+      } else if (networkEvent.equals("TEST_START") || networkEvent.equals("WORDS_UPDATE")) {
+        this.chars = ((String) ((JSONObject) result.get("data")).get("chars"));
+      }
 
       for (EventListener listener : listeners) {
         if (listener != null) {
@@ -206,9 +220,9 @@ class LongPollingManager extends Thread {
 // Serves as replacement for StatsTracker during multiplayer session
 // Re-use some events used by StatsTracker
 public class NetworkManager {
-  public static final String BASE_URL = "http://localhost:3000";
+  public static final String BASE_URL = "https://coffeetype-api.brendan-ch.repl.co";
   public static final int MAX_LISTENERS = 10;
-  public static final int MAX_PLAYERS = 10;
+  public static final int MAX_PLAYERS = 8;
   
   private String roomKey;
   private String playerId;
@@ -282,7 +296,7 @@ public class NetworkManager {
     // Build the request body
     JSONObject body = new JSONObject();
     body.put("playerName", this.nickname);
-    body.put("roomKey", this.roomKey);
+    body.put("roomKey", roomKey);
 
     // Send a HTTP request to create a room
     HttpRequest request = HttpRequest.newBuilder(
@@ -300,9 +314,14 @@ public class NetworkManager {
     try {
       JSONObject result = (JSONObject) parser.parse(future.get().body());
 
+      if (!((Boolean) result.get("success"))) {
+        return;
+      }
+
       // Set room key and player ID
       this.roomKey = (String) result.get("roomKey");
       this.playerId = (String) result.get("playerId");
+      this.players = (JSONArray) ((JSONObject) result.get("data")).get("players");
 
       fireEventListeners(new Event(Event.NETWORK_STATUS_CHANGE));
 
@@ -342,13 +361,54 @@ public class NetworkManager {
     try {
       JSONObject result = (JSONObject) parser.parse(future.get().body());
 
+      if (!((Boolean) result.get("success"))) {
+        return;
+      }
+
       // Set room key and player ID
       this.roomKey = (String) result.get("roomKey");
       this.playerId = (String) result.get("playerId");
+      this.players = (JSONArray) ((JSONObject) result.get("data")).get("players");
 
       fireEventListeners(new Event(Event.NETWORK_STATUS_CHANGE));
 
       this.initializeLongPolling();
+    } catch(InterruptedException e) {
+
+    } catch(ExecutionException e) {
+      
+    } catch(ParseException e) {
+
+    }
+  }
+
+  public void startTest() {
+    if (roomKey == null || playerId == null) return;
+
+    // Build the request body
+    JSONObject body = new JSONObject();
+    body.put("roomKey", this.roomKey);
+    body.put("playerId", this.playerId);
+
+    // Send a HTTP request to create a room
+    HttpRequest request = HttpRequest.newBuilder(
+      URI.create(BASE_URL + "/api/post/start")
+    )
+      .header("accept", "application/json")
+      .header("content-type", "application/json")
+      .POST(BodyPublishers.ofString(body.toString()))
+      .build();
+
+    CompletableFuture<HttpResponse<String>> future = client.sendAsync(request, BodyHandlers.ofString());
+
+    JSONParser parser = new JSONParser();
+
+    try {
+      JSONObject result = (JSONObject) parser.parse(future.get().body());
+
+      if (!((Boolean) result.get("success"))) {
+        return;
+      }
     } catch(InterruptedException e) {
 
     } catch(ExecutionException e) {
@@ -367,15 +427,22 @@ public class NetworkManager {
     // Add some event listeners
     class LongPollingListener implements EventListener {
       public void actionPerformed(Event e) {
-        if (e.EVENT_TYPE == Event.NETWORK_PLAYERS_UPDATE) {
+        if (longPollingManager != null && e.EVENT_TYPE == Event.NETWORK_PLAYERS_UPDATE) {
           // Update the JSONObject array
           players = longPollingManager.getPlayers();
-        } else if (e.EVENT_TYPE == Event.NETWORK_TEST_START) {
+          // System.out.println(players);
+        } else if (e.EVENT_TYPE == Event.NETWORK_TEST_START || e.EVENT_TYPE == Event.NETWORK_WORDS_UPDATE) {
+          // Set words
+          characters = longPollingManager.getChars();
+
           // Start sending updates
           initializeTestUpdates();
         } else if (e.EVENT_TYPE == Event.NETWORK_TEST_END) {
           // Stop sending updates
           stopTestUpdates();
+
+          // Reset the test
+          typed = "";
         }
 
         // Pass events up
@@ -396,7 +463,7 @@ public class NetworkManager {
   public void initializeTestUpdates() {
     if (this.testUpdateManager != null) return;
 
-    this.testUpdateManager = new TestUpdateManager(roomKey, playerId, client);
+    this.testUpdateManager = new TestUpdateManager(roomKey, playerId, client, typed);
     this.testUpdateManager.start();
   }
 
@@ -437,6 +504,9 @@ public class NetworkManager {
       // Remove room key and player ID
       this.roomKey = null;
       this.playerId = null;
+
+      this.stopLongPolling();
+      this.stopTestUpdates();
 
       // Fire event listeners
       fireEventListeners(new Event(Event.NETWORK_STATUS_CHANGE));

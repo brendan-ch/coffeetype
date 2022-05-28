@@ -1,6 +1,7 @@
 package renderers;
 
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
@@ -24,6 +25,7 @@ import helpers.NetworkManager;
 public class PlayersScreen implements CustomComponent {
   public static final String PAGE_TITLE = "Players";
   public static final int COUNTDOWN_VALUE = 5;
+  public static final int MAX_LISTENERS = 5;
 
   private JPanel panel;
   private JLabel[] items;
@@ -33,7 +35,15 @@ public class PlayersScreen implements CustomComponent {
   private Timer countdown;
   private int countdownValue;
 
+  private JPanel buttonWrapper;
+
+  private EventListener[] listeners;
+  private int numListeners;
+
   public PlayersScreen(NetworkManager networkManager) {
+    this.listeners = new EventListener[MAX_LISTENERS];
+    this.numListeners = 0;
+    
     this.networkManager = networkManager;
     this.countdownValue = COUNTDOWN_VALUE;
 
@@ -43,6 +53,9 @@ public class PlayersScreen implements CustomComponent {
         countdownValue--;
 
         if (countdownValue <= 0) {
+          // Fire event
+          fireEventListeners(new Event(Event.NETWORK_TEST_START_DELAY_END));
+
           // Reset the countdown
           // Switch to the words screen
           resetCountdown();
@@ -59,7 +72,8 @@ public class PlayersScreen implements CustomComponent {
         if (e.EVENT_TYPE == Event.NETWORK_TEST_START) {
           // Begin countdown
           countdown.start();
-        } else if (e.EVENT_TYPE == Event.NETWORK_PLAYERS_UPDATE) {
+        } else if (e.EVENT_TYPE == Event.NETWORK_PLAYERS_UPDATE || e.EVENT_TYPE == Event.NETWORK_STATUS_CHANGE) {
+          // System.out.println("Re-rendering player list");
           // Re-render player list
           render();
         }
@@ -77,12 +91,7 @@ public class PlayersScreen implements CustomComponent {
     PageHeader header = new PageHeader(PAGE_TITLE, false);
     this.panel.add(header.getPanel());
 
-    JPanel itemWrapper = new JPanel();
-    itemWrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
-    itemWrapper.setLayout(new BoxLayout(itemWrapper, BoxLayout.Y_AXIS));
-    itemWrapper.setBackground(Constants.BACKGROUND);
-
-    this.items = new JLabel[this.networkManager.MAX_PLAYERS];
+    this.items = new JLabel[NetworkManager.MAX_PLAYERS];
 
     for (int i = 0; i < this.items.length; i++) {
       JPanel wrapper = new JPanel();
@@ -101,6 +110,11 @@ public class PlayersScreen implements CustomComponent {
       this.panel.add(wrapper);
     }
 
+    this.buttonWrapper = new JPanel();
+    this.buttonWrapper.setLayout(new FlowLayout(FlowLayout.CENTER));
+    this.buttonWrapper.setBackground(Constants.BACKGROUND);
+    this.panel.add(buttonWrapper);
+
     // class HeaderListener implements EventListener {
     //   public void actionPerformed(Event e) {
     //     for (EventListener listener : listeners) {
@@ -112,6 +126,7 @@ public class PlayersScreen implements CustomComponent {
     // }
     // header.addEventListener(new HeaderListener());
 
+    this.render();
   }
 
   public JPanel getPanel() {
@@ -122,6 +137,7 @@ public class PlayersScreen implements CustomComponent {
     int labelIndex = 0;
 
     JSONArray players = this.networkManager.getPlayers();
+    if (players == null) return;
     
     // Re-render based on players
     for (int i = players.size() - 1; i >= 0; i--) {
@@ -139,11 +155,64 @@ public class PlayersScreen implements CustomComponent {
         labelIndex++;
       }
     }
+
+    // Render button panel depending on whether player is host
+    // Remove item
+    Component[] components = this.buttonWrapper.getComponents();
+    for (Component component : components) {
+      this.buttonWrapper.remove(component);
+    }
+
+    // Add item
+    boolean isHost = false;
+    for (int i = 0; i < players.size(); i++) {
+      // If host
+      if (((Boolean) ((JSONObject) players.get(i)).get("host"))) {
+        isHost = true; 
+      }
+    }
+
+    if (isHost) {
+      // Add start button
+      JButton startButton = new JButton("Start");
+
+      class StartButtonListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+          // Start the test
+          networkManager.startTest();
+        }
+      }
+      startButton.addActionListener(new StartButtonListener());
+      startButton.setFocusable(false);
+
+      buttonWrapper.add(startButton);
+    } else {
+      // Add waiting text
+      JLabel waitingText = new JLabel("Waiting for host to start...");
+      waitingText.setForeground(Constants.EMPHASIS_COLOR);
+      waitingText.setBackground(Constants.BACKGROUND);
+      buttonWrapper.add(waitingText);
+    }
   }
 
   private void resetCountdown() {
     // Stop the timer
     this.countdown.stop();
     this.countdownValue = COUNTDOWN_VALUE;
+  }
+
+  public void addEventListener(EventListener listener) {
+    if (numListeners < MAX_LISTENERS) {
+      this.listeners[numListeners++] = listener; 
+    }
+  }
+
+  private void fireEventListeners(Event e) {
+    // Pass events up
+    for (EventListener listener : listeners) {
+      if (listener != null) {
+        listener.actionPerformed(e);
+      }
+    }
   }
 }

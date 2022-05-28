@@ -1,0 +1,2 @@
+language = "java11"
+run = "mvn compile assembly:single && java -jar target/coffeetype-1.0.0-jar-with-dependencies.jar"

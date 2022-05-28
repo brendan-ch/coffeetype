@@ -17,8 +17,6 @@ import helpers.StatsTracker;
 import helpers.Test;
 import helpers.Constants;
 
-
-
 /**
  * Display user's history of tests.
  */
@@ -48,11 +46,6 @@ public class HistoryScreen implements CustomComponent {
 
     PageHeader header = new PageHeader(PAGE_TITLE, true);
     this.panel.add(header.getPanel());
-
-    JPanel itemWrapper = new JPanel();
-    itemWrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
-    itemWrapper.setLayout(new BoxLayout(itemWrapper, BoxLayout.Y_AXIS));
-    itemWrapper.setBackground(Constants.BACKGROUND);
 
     class HeaderListener implements EventListener {
       public void actionPerformed(Event e) {

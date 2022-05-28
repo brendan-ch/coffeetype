@@ -40,8 +40,10 @@ public class Event {
   public static final int NETWORK_WORDS_UPDATE = 15;
   public static final int NETWORK_PLAYERS_UPDATE = 16;
 
+  public static final int NETWORK_TEST_START_DELAY_END = 17;
+
   // Indicates join or exit
-  public static final int NETWORK_STATUS_CHANGE = 17;
+  public static final int NETWORK_STATUS_CHANGE = 18;
 
   public final int EVENT_TYPE;
   
