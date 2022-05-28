@@ -1,0 +1,41 @@
+arabica
+robusta
+liberica
+excelsa
+raf
+drip
+pour over
+espresso
+cold brew
+cappuccino
+latte
+americano
+cortado
+red eye
+mocha
+macchiato
+flat white
+cafe au lait
+nitro
+frappe
+affogato
+frappuccino
+mazagran
+eiscaffee
+long black
+batch brew
+doppio
+vienna
+galao
+piccolo
+con panna
+kopi luwak
+geisha
+kaffeost
+kahvesi
+einspanner
+scandinavian egg
+dalgona
+irish
+lungo
+ristretto
