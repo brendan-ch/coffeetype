@@ -76,7 +76,7 @@ public class WordDisplay implements CustomComponent {
       public void actionPerformed(Event e) {
         if (e.EVENT_TYPE == Event.NETWORK_STATUS_CHANGE) {
 
-        } else if (e.EVENT_TYPE == Event.NETWORK_WORDS_UPDATE) {
+        } else if (e.EVENT_TYPE == Event.NETWORK_WORDS_UPDATE || e.EVENT_TYPE == Event.NETWORK_TEST_START) {
           updateWords();
           render();
         }
@@ -105,7 +105,11 @@ public class WordDisplay implements CustomComponent {
         // Check if backspace
         if (e.getKeyCode() == 8) {
           // Remove a letter
-          stats.deleteLetter();
+          if (networkManager.getConnectionStatus()) {
+            networkManager.deleteLetter();
+          } else {
+            stats.deleteLetter();
+          }
 
           charsBeforeNextRow++;
         // Escape key -> quick reset
@@ -113,6 +117,7 @@ public class WordDisplay implements CustomComponent {
           stats.resetTest();
           setNumCharsInRow();
         } else if ((e.getKeyCode() >= 44 && e.getKeyCode() <= 111) || e.getKeyCode() == 32 || e.getKeyCode() == 222) {
+          System.out.println("Adding letter");
           if (networkManager.getConnectionStatus()) {
             // Update words in network manager
             networkManager.addLetter(String.valueOf(e.getKeyChar()));
@@ -194,13 +199,18 @@ public class WordDisplay implements CustomComponent {
 
       String toSet = "<html><p>";
 
+      String typed = this.stats.getTyped();
+
+      if (this.networkManager.getConnectionStatus()) {
+        typed = this.networkManager.getTyped();
+      }
+
       // Loop through RenderedChars
       for (int c = 0; c < MAX_CHARS; c++) {
         if (this.chars[r][c] != null) {
           // Append the character to the toSet string
           String character = this.chars[r][c].CHARACTER;
           int index = this.chars[r][c].INDEX;
-          String typed = this.stats.getTyped();
 
           // Compare to index in StatsTracker
           if (index > typed.length()) {
