@@ -183,6 +183,7 @@ public class PlayersScreen implements CustomComponent {
         }
       }
       startButton.addActionListener(new StartButtonListener());
+      startButton.setFocusable(false);
 
       buttonWrapper.add(startButton);
     } else {
