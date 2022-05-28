@@ -296,7 +296,7 @@ public class NetworkManager {
     // Build the request body
     JSONObject body = new JSONObject();
     body.put("playerName", this.nickname);
-    body.put("roomKey", this.roomKey);
+    body.put("roomKey", roomKey);
 
     // Send a HTTP request to create a room
     HttpRequest request = HttpRequest.newBuilder(
