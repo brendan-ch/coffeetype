@@ -172,6 +172,7 @@ public class NavigationBar implements CustomComponent {
     
     this.buttonsPanel.add(this.testInactiveButtons);
     this.buttonsPanel.add(this.testActiveButtons);
+    this.buttonsPanel.add(this.multiplayerActiveButtons);
 
     // this.statsWrapper.add(this.loginInfo.getPanel());
     this.statsWrapper.add(this.statsRenderer.getPanel());
@@ -213,15 +214,12 @@ public class NavigationBar implements CustomComponent {
     if (this.networkManager.getConnectionStatus()) {
       // Show multiplayer buttons
       c.show(this.buttonsPanel, MULTIPLAYER_BUTTONS);
-      this.testActiveRendered = false;
-    } else if (this.stats.getTimerStatus() && !this.testActiveRendered) {
+    } else if (this.stats.getTimerStatus()) {
       // If test is running, and correct buttons not displayed already
       // Switch the layout
       c.show(this.buttonsPanel, TEST_ACTIVE_BUTTONS);
-      this.testActiveRendered = true;
-    } else if (!this.stats.getTimerStatus() && this.testActiveRendered) {
+    } else if (!this.stats.getTimerStatus()) {
       c.show(this.buttonsPanel, TEST_INACTIVE_BUTTONS);
-      this.testActiveRendered = false;
     }
   }
 }
