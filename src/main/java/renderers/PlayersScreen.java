@@ -60,6 +60,7 @@ public class PlayersScreen implements CustomComponent {
           // Begin countdown
           countdown.start();
         } else if (e.EVENT_TYPE == Event.NETWORK_PLAYERS_UPDATE) {
+          // System.out.println("Re-rendering player list");
           // Re-render player list
           render();
         }
@@ -112,6 +113,7 @@ public class PlayersScreen implements CustomComponent {
     // }
     // header.addEventListener(new HeaderListener());
 
+    this.render();
   }
 
   public JPanel getPanel() {
@@ -122,6 +124,7 @@ public class PlayersScreen implements CustomComponent {
     int labelIndex = 0;
 
     JSONArray players = this.networkManager.getPlayers();
+    if (players == null) return;
     
     // Re-render based on players
     for (int i = players.size() - 1; i >= 0; i--) {
