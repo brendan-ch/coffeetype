@@ -82,7 +82,7 @@ public class PlayersScreen implements CustomComponent {
     itemWrapper.setLayout(new BoxLayout(itemWrapper, BoxLayout.Y_AXIS));
     itemWrapper.setBackground(Constants.BACKGROUND);
 
-    this.items = new JLabel[this.networkManager.MAX_PLAYERS];
+    this.items = new JLabel[NetworkManager.MAX_PLAYERS];
 
     for (int i = 0; i < this.items.length; i++) {
       JPanel wrapper = new JPanel();
