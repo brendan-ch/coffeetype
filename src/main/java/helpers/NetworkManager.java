@@ -220,7 +220,7 @@ class LongPollingManager extends Thread {
 // Serves as replacement for StatsTracker during multiplayer session
 // Re-use some events used by StatsTracker
 public class NetworkManager {
-  public static final String BASE_URL = "http://localhost:3000";
+  public static final String BASE_URL = "https://coffeetype-api.brendan-ch.repl.co";
   public static final int MAX_LISTENERS = 10;
   public static final int MAX_PLAYERS = 8;
   
