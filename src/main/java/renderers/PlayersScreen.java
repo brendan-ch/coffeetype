@@ -1,6 +1,7 @@
 package renderers;
 
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
@@ -32,6 +33,8 @@ public class PlayersScreen implements CustomComponent {
   // Countdown timer until the test starts
   private Timer countdown;
   private int countdownValue;
+
+  private JPanel buttonWrapper;
 
   public PlayersScreen(NetworkManager networkManager) {
     this.networkManager = networkManager;
@@ -78,11 +81,6 @@ public class PlayersScreen implements CustomComponent {
     PageHeader header = new PageHeader(PAGE_TITLE, false);
     this.panel.add(header.getPanel());
 
-    JPanel itemWrapper = new JPanel();
-    itemWrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
-    itemWrapper.setLayout(new BoxLayout(itemWrapper, BoxLayout.Y_AXIS));
-    itemWrapper.setBackground(Constants.BACKGROUND);
-
     this.items = new JLabel[NetworkManager.MAX_PLAYERS];
 
     for (int i = 0; i < this.items.length; i++) {
@@ -101,6 +99,11 @@ public class PlayersScreen implements CustomComponent {
 
       this.panel.add(wrapper);
     }
+
+    this.buttonWrapper = new JPanel();
+    this.buttonWrapper.setLayout(new FlowLayout(FlowLayout.CENTER));
+    this.buttonWrapper.setBackground(Constants.BACKGROUND);
+    this.panel.add(buttonWrapper);
 
     // class HeaderListener implements EventListener {
     //   public void actionPerformed(Event e) {
@@ -141,6 +144,34 @@ public class PlayersScreen implements CustomComponent {
         
         labelIndex++;
       }
+    }
+
+    // Render button panel depending on whether player is host
+    // Remove item
+    Component[] components = this.buttonWrapper.getComponents();
+    for (Component component : components) {
+      this.buttonWrapper.remove(component);
+    }
+
+    // Add item
+    boolean isHost = false;
+    for (int i = 0; i < players.size(); i++) {
+      // If host
+      if (((Boolean) ((JSONObject) players.get(i)).get("host"))) {
+        isHost = true; 
+      }
+    }
+
+    if (isHost) {
+      // Add start button
+      JButton startButton = new JButton("Start");
+      buttonWrapper.add(startButton);
+    } else {
+      // Add waiting text
+      JLabel waitingText = new JLabel("Waiting for host to start...");
+      waitingText.setForeground(Constants.EMPHASIS_COLOR);
+      waitingText.setBackground(Constants.BACKGROUND);
+      buttonWrapper.add(waitingText);
     }
   }
 
