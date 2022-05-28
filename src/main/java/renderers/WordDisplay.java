@@ -117,7 +117,6 @@ public class WordDisplay implements CustomComponent {
           stats.resetTest();
           setNumCharsInRow();
         } else if ((e.getKeyCode() >= 44 && e.getKeyCode() <= 111) || e.getKeyCode() == 32 || e.getKeyCode() == 222) {
-          System.out.println("Adding letter");
           if (networkManager.getConnectionStatus()) {
             // Update words in network manager
             networkManager.addLetter(String.valueOf(e.getKeyChar()));
