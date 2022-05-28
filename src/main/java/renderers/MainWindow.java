@@ -99,6 +99,7 @@ public class MainWindow implements CustomComponent {
           // Exit multiplayer
           networkManager.exitRoom();
           c.show(contentWrapper, WORD_DISPLAY);
+          wordDisplay.render();
         }
       }
     }
