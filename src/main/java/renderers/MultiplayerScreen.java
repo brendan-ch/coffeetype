@@ -5,6 +5,8 @@ import javax.swing.border.*;
 
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 import helpers.*;
 import assets.*;
@@ -74,8 +76,58 @@ class MultiplayerScreen implements CustomComponent {
         } else if (e.EVENT_TYPE == Event.JOIN_ROOM_PRESSED) {
           // Open a new window with an input
           JFrame newFrame = new JFrame();
-          JPanel inputPanel = new JPanel();
 
+          JPanel inputPanel = new JPanel();
+          inputPanel.setLayout(new BoxLayout(inputPanel, BoxLayout.PAGE_AXIS));
+          JTextField textField = new JTextField();
+
+          textField.setSize(50, 15);
+          inputPanel.add(textField);
+          
+          // JLabel label = new JLabel("Press enter to join, or esc to cancel");
+          // inputPanel.add(label);
+          
+          JButton enterButton = new JButton("Join");
+          JButton cancelButton = new JButton("Cancel");
+
+          inputPanel.add(enterButton);
+          inputPanel.add(cancelButton);
+
+          class EnterListener implements ActionListener {
+            private JTextField textField;
+
+            public EnterListener(JTextField textField) {
+              this.textField = textField;
+            }
+
+            public void actionPerformed(ActionEvent e) {
+              // Join the room
+              String code = textField.getText();
+              networkManager.joinRoom(code);
+            }
+          }
+
+          class CancelListener implements ActionListener {
+            private JFrame frame;
+
+            public CancelListener(JFrame frame) {
+              this.frame = frame;
+
+            }
+            public void actionPerformed(ActionEvent e) {
+              // Close the frame
+              this.frame.dispose();
+            }
+          }
+
+          enterButton.addActionListener(new EnterListener(textField));
+          cancelButton.addActionListener(new CancelListener(newFrame));
+          newFrame.add(inputPanel);
+
+          newFrame.pack();
+          newFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+          newFrame.setResizable(false);
+          newFrame.setVisible(true);
           
         }
       }
@@ -92,9 +144,10 @@ class MultiplayerScreen implements CustomComponent {
     joinRoomHeader.setFont(Assets.TYPING_FONT);
     joinRoomHeader.setForeground(Constants.EMPHASIS_COLOR);
     
-    IconButton joinRoomButton = new IconButton(Assets.scaleIcon(Assets.NEXT_TEST), Event.NEW_ROOM_PRESSED);
+    IconButton joinRoomButton = new IconButton(Assets.scaleIcon(Assets.NEXT_TEST), Event.JOIN_ROOM_PRESSED);
     joinRoomPanel.add(joinRoomHeader);
     joinRoomPanel.add(joinRoomButton.getPanel());
+    joinRoomButton.addEventListener(new ButtonListener(networkManager));
     
     this.panel.add(joinRoomPanel);
 
