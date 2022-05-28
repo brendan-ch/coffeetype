@@ -183,6 +183,23 @@ public class MainWindow implements CustomComponent {
       }
     }
     this.resultsScreen.addEventListener(new ResultsScreenListener(c));
+
+    class PlayersScreenListener implements EventListener {
+      private CardLayout c;
+
+      public PlayersScreenListener(CardLayout c) {
+        this.c = c;
+      }
+
+      public void actionPerformed(Event e) {
+        if (e.EVENT_TYPE == Event.NETWORK_TEST_START_DELAY_END) {
+          // Switch to the words screen
+          c.show(contentWrapper, WORD_DISPLAY);
+          wordDisplay.render();
+        }
+      }
+    }
+    this.playersScreen.addEventListener(new PlayersScreenListener(c));
     
     // Event listener for when test is complete
     class StatsEventListener implements EventListener {
