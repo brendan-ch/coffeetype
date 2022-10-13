@@ -4,9 +4,10 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.brendan.coffeetype</groupId>
+  <groupId>dev.bchen.coffeetype</groupId>
   <artifactId>coffeetype</artifactId>
   <version>1.0.0</version>
+  <packaging>jar</packaging>
 
   <name>coffeetype</name>
   <!-- FIXME change it to the project's website -->
@@ -60,13 +61,22 @@
           <configuration>
             <archive>
               <manifest>
-                <mainClass>App</mainClass>
+                <mainClass>dev.bchen.coffeetype.App</mainClass>
               </manifest>
             </archive>
             <descriptorRefs>
               <descriptorRef>jar-with-dependencies</descriptorRef>
             </descriptorRefs>
           </configuration>
+          <executions>
+            <execution>
+              <id>make-assembly</id>
+              <phase>package</phase>
+              <goals>
+                <goal>single</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
         <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
@@ -108,5 +118,22 @@
         </plugin>
       </plugins>
     </pluginManagement>
+    <resources>
+      <resource>
+        <directory>src/main/resources/words</directory>
+        <includes>
+          <include>**/*.txt</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>src/main/resources/assets</directory>
+        <includes>
+          <include>**/*.png</include>
+          <include>**/*.ttf</include>
+          <include>**/*.html</include>
+        </includes>
+      </resource>
+
+    </resources>
   </build>
 </project>
