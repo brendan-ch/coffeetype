@@ -84,10 +84,11 @@ public class NavigationBar implements CustomComponent {
     settingsButton.getPanel().setBackground(Constants.ALT_LIST_COLOR);
     testInactiveButtons.add(settingsButton.getPanel());
 
-    IconButton inviteButton = new IconButton(Assets.scaleIcon(Assets.INVITE), Event.INVITE_BUTTON_PRESS);
-    inviteButton.getPanel().setAlignmentX(Component.CENTER_ALIGNMENT);
-    inviteButton.getPanel().setBackground(Constants.ALT_LIST_COLOR);
-    testInactiveButtons.add(inviteButton.getPanel());
+    // Create the invite button
+    // IconButton inviteButton = new IconButton(Assets.scaleIcon(Assets.INVITE), Event.INVITE_BUTTON_PRESS);
+    // inviteButton.getPanel().setAlignmentX(Component.CENTER_ALIGNMENT);
+    // inviteButton.getPanel().setBackground(Constants.ALT_LIST_COLOR);
+    // testInactiveButtons.add(inviteButton.getPanel());
 
     // Create the button listener
     // Passes events back up to the MainWindow class
@@ -103,7 +104,7 @@ public class NavigationBar implements CustomComponent {
     // Pass events back up
     settingsButton.addEventListener(new ButtonListener());
     historyButton.addEventListener(new ButtonListener());
-    inviteButton.addEventListener(new ButtonListener());
+    // inviteButton.addEventListener(new ButtonListener());
 
     // Create a different panel for the restart button
     this.testActiveButtons = new JPanel();
