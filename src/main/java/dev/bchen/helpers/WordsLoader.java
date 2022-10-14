@@ -2,8 +2,14 @@ package dev.bchen.helpers;
 
 // For text file loading
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.*;
 
 /**
@@ -11,8 +17,8 @@ import java.util.stream.*;
  */
 public class WordsLoader {
   // Folder name of the word files
-  public static final String PATH_NORMAL = "src/main/resources/words/normal.txt";
-  public static final String PATH_HARD = "src/main/resources/words/hard.txt";
+  public static final String PATH_NORMAL = "/words/normal.txt";
+  public static final String PATH_HARD = "/words/hard.txt";
 
   // Store num lines as an int instead of calculating
   // from text file
@@ -52,6 +58,21 @@ public class WordsLoader {
       path = PATH_HARD;
     }
 
+    Map<String, String> env = new HashMap<>(); 
+    env.put("create", "true");
+    URI uri;
+    FileSystem zipfs;
+    try {
+      uri = WordsLoader.class.getResource(path).toURI();
+      zipfs = FileSystems.newFileSystem(uri, env);
+    } catch(URISyntaxException e) {
+      System.out.println(e);
+      return "";
+    } catch(IOException e) {
+      System.out.println(e);
+      return "";
+    }
+
     String characters = "";
 
     while (numLoaded < numToLoad) {
@@ -61,7 +82,8 @@ public class WordsLoader {
 
       // Get the word from that line
       // https://www.educative.io/edpresso/reading-the-nth-line-from-a-file-in-java
-      try (Stream<String> lines = Files.lines(Paths.get(path))) {
+      // To-do: use WordsLoader.class.getResource() to retrieve asset
+      try (Stream<String> lines = Files.lines(Paths.get(uri))) {
         line = lines.skip(lineToGet - 1).findFirst().get();
 
         // Loop through characters
