@@ -7,7 +7,7 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
+// import java.util.concurrent.ExecutionException;
 
 import javax.swing.Timer;
 
@@ -15,8 +15,8 @@ import java.awt.event.*;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+// import org.json.simple.parser.JSONParser;
+// import org.json.simple.parser.ParseException;
 
 // Handle test updates
 // Create and start when test begins
@@ -110,7 +110,7 @@ class LongPollingManager extends Thread {
 
   private String roomKey;
   private String playerId;
-  private HttpClient client;
+  // private HttpClient client;
 
   private JSONArray players;
 
@@ -122,7 +122,7 @@ class LongPollingManager extends Thread {
   public LongPollingManager(String roomKey, String playerId, HttpClient client) {
     this.roomKey = roomKey;
     this.playerId = playerId;
-    this.client = client;
+    // this.client = client;
 
     this.chars = "";
 
@@ -154,58 +154,58 @@ class LongPollingManager extends Thread {
    */
   public void longPoll() {
     // Send a HTTP request to create a room
-    HttpRequest request = HttpRequest.newBuilder(
-      URI.create(NetworkManager.BASE_URL + "/api/get/update?playerId=" + this.playerId + "&roomKey=" + this.roomKey)
-    )
-      .header("accept", "application/json")
-      .header("content-type", "application/json")
-      .GET()
-      .build();
+    // HttpRequest request = HttpRequest.newBuilder(
+    //   URI.create(NetworkManager.BASE_URL + "/api/get/update?playerId=" + this.playerId + "&roomKey=" + this.roomKey)
+    // )
+    //   .header("accept", "application/json")
+    //   .header("content-type", "application/json")
+    //   .GET()
+    //   .build();
 
-    CompletableFuture<HttpResponse<String>> future = client.sendAsync(request, BodyHandlers.ofString());
-    JSONParser parser = new JSONParser();
+    // CompletableFuture<HttpResponse<String>> future = client.sendAsync(request, BodyHandlers.ofString());
+    // JSONParser parser = new JSONParser();
 
-    try {
-      JSONObject result = (JSONObject) parser.parse(future.get().body());
+    // try {
+    //   JSONObject result = (JSONObject) parser.parse(future.get().body());
 
-      if (!((Boolean) result.get("success"))) {
-        return;
-      }
+    //   if (!((Boolean) result.get("success"))) {
+    //     return;
+    //   }
       
-      String networkEvent = (String) result.get("event");
-      String[] networkEvents = {"TEST_START", "TEST_END", "WORDS_UPDATE", "PLAYERS_UPDATE"};
-      if (networkEvent.equals("PLAYERS_UPDATE") || networkEvent.equals("TEST_END")) {
-        // Update the local players array
-        this.players = (JSONArray) ((JSONObject) result.get("data")).get("players");
-      } else if (networkEvent.equals("TEST_START") || networkEvent.equals("WORDS_UPDATE")) {
-        this.chars = ((String) ((JSONObject) result.get("data")).get("chars"));
-      }
+    //   String networkEvent = (String) result.get("event");
+    //   String[] networkEvents = {"TEST_START", "TEST_END", "WORDS_UPDATE", "PLAYERS_UPDATE"};
+    //   if (networkEvent.equals("PLAYERS_UPDATE") || networkEvent.equals("TEST_END")) {
+    //     // Update the local players array
+    //     this.players = (JSONArray) ((JSONObject) result.get("data")).get("players");
+    //   } else if (networkEvent.equals("TEST_START") || networkEvent.equals("WORDS_UPDATE")) {
+    //     this.chars = ((String) ((JSONObject) result.get("data")).get("chars"));
+    //   }
 
-      for (EventListener listener : listeners) {
-        if (listener != null) {
-          // Match local events to network events, using indices
-          int[] localEvents = {Event.NETWORK_TEST_START, Event.NETWORK_TEST_END, Event.NETWORK_WORDS_UPDATE, Event.NETWORK_PLAYERS_UPDATE};
+    //   for (EventListener listener : listeners) {
+    //     if (listener != null) {
+    //       // Match local events to network events, using indices
+    //       int[] localEvents = {Event.NETWORK_TEST_START, Event.NETWORK_TEST_END, Event.NETWORK_WORDS_UPDATE, Event.NETWORK_PLAYERS_UPDATE};
 
-          // Perform linear search
-          int index = -1;
-          for (int i = 0; i < networkEvents.length; i++) {
-            if (networkEvents[i].equals(networkEvent)) {
-              index = i;
-            }
-          }
+    //       // Perform linear search
+    //       int index = -1;
+    //       for (int i = 0; i < networkEvents.length; i++) {
+    //         if (networkEvents[i].equals(networkEvent)) {
+    //           index = i;
+    //         }
+    //       }
 
-          if (index > -1) {
-            listener.actionPerformed(new Event(localEvents[index]));
-          }
-        }
-      }
-    } catch(InterruptedException e) {
+    //       if (index > -1) {
+    //         listener.actionPerformed(new Event(localEvents[index]));
+    //       }
+    //     }
+    //   }
+    // } catch(InterruptedException e) {
 
-    } catch(ExecutionException e) {
+    // } catch(ExecutionException e) {
       
-    } catch(ParseException e) {
+    // } catch(ParseException e) {
 
-    }
+    // }
   }
 
   // "Add" an event listener
@@ -294,128 +294,128 @@ public class NetworkManager {
   // Join a room, set roomKey and playerId
   public void joinRoom(String roomKey) {
     // Build the request body
-    JSONObject body = new JSONObject();
-    body.put("playerName", this.nickname);
-    body.put("roomKey", roomKey);
+    // JSONObject body = new JSONObject();
+    // body.put("playerName", this.nickname);
+    // body.put("roomKey", roomKey);
 
-    // Send a HTTP request to create a room
-    HttpRequest request = HttpRequest.newBuilder(
-      URI.create(BASE_URL + "/api/post/join")
-    )
-      .header("accept", "application/json")
-      .header("content-type", "application/json")
-      .POST(BodyPublishers.ofString(body.toString()))
-      .build();
+    // // Send a HTTP request to create a room
+    // HttpRequest request = HttpRequest.newBuilder(
+    //   URI.create(BASE_URL + "/api/post/join")
+    // )
+    //   .header("accept", "application/json")
+    //   .header("content-type", "application/json")
+    //   .POST(BodyPublishers.ofString(body.toString()))
+    //   .build();
 
-    CompletableFuture<HttpResponse<String>> future = client.sendAsync(request, BodyHandlers.ofString());
+    // CompletableFuture<HttpResponse<String>> future = client.sendAsync(request, BodyHandlers.ofString());
 
-    JSONParser parser = new JSONParser();
+    // JSONParser parser = new JSONParser();
 
-    try {
-      JSONObject result = (JSONObject) parser.parse(future.get().body());
+    // try {
+    //   JSONObject result = (JSONObject) parser.parse(future.get().body());
 
-      if (!((Boolean) result.get("success"))) {
-        return;
-      }
+    //   if (!((Boolean) result.get("success"))) {
+    //     return;
+    //   }
 
-      // Set room key and player ID
-      this.roomKey = (String) result.get("roomKey");
-      this.playerId = (String) result.get("playerId");
-      this.players = (JSONArray) ((JSONObject) result.get("data")).get("players");
+    //   // Set room key and player ID
+    //   this.roomKey = (String) result.get("roomKey");
+    //   this.playerId = (String) result.get("playerId");
+    //   this.players = (JSONArray) ((JSONObject) result.get("data")).get("players");
 
-      fireEventListeners(new Event(Event.NETWORK_STATUS_CHANGE));
+    //   fireEventListeners(new Event(Event.NETWORK_STATUS_CHANGE));
 
-      this.initializeLongPolling();
-    } catch(InterruptedException e) {
+    //   this.initializeLongPolling();
+    // } catch(InterruptedException e) {
 
-    } catch(ExecutionException e) {
+    // } catch(ExecutionException e) {
       
-    } catch(ParseException e) {
+    // } catch(ParseException e) {
 
-    }
+    // }
   }
 
   /**
    * Create a room.
    */
   public void createRoom() {
-    if (roomKey != null || playerId != null) return;
+    // if (roomKey != null || playerId != null) return;
 
-    // Build the request body
-    JSONObject body = new JSONObject();
-    body.put("playerName", this.nickname);
+    // // Build the request body
+    // JSONObject body = new JSONObject();
+    // body.put("playerName", this.nickname);
 
-    // Send a HTTP request to create a room
-    HttpRequest request = HttpRequest.newBuilder(
-      URI.create(BASE_URL + "/api/post/createRoom")
-    )
-      .header("accept", "application/json")
-      .header("content-type", "application/json")
-      .POST(BodyPublishers.ofString(body.toString()))
-      .build();
+    // // Send a HTTP request to create a room
+    // HttpRequest request = HttpRequest.newBuilder(
+    //   URI.create(BASE_URL + "/api/post/createRoom")
+    // )
+    //   .header("accept", "application/json")
+    //   .header("content-type", "application/json")
+    //   .POST(BodyPublishers.ofString(body.toString()))
+    //   .build();
 
-    CompletableFuture<HttpResponse<String>> future = client.sendAsync(request, BodyHandlers.ofString());
+    // CompletableFuture<HttpResponse<String>> future = client.sendAsync(request, BodyHandlers.ofString());
 
-    JSONParser parser = new JSONParser();
+    // JSONParser parser = new JSONParser();
 
-    try {
-      JSONObject result = (JSONObject) parser.parse(future.get().body());
+    // try {
+    //   JSONObject result = (JSONObject) parser.parse(future.get().body());
 
-      if (!((Boolean) result.get("success"))) {
-        return;
-      }
+    //   if (!((Boolean) result.get("success"))) {
+    //     return;
+    //   }
 
-      // Set room key and player ID
-      this.roomKey = (String) result.get("roomKey");
-      this.playerId = (String) result.get("playerId");
-      this.players = (JSONArray) ((JSONObject) result.get("data")).get("players");
+    //   // Set room key and player ID
+    //   this.roomKey = (String) result.get("roomKey");
+    //   this.playerId = (String) result.get("playerId");
+    //   this.players = (JSONArray) ((JSONObject) result.get("data")).get("players");
 
-      fireEventListeners(new Event(Event.NETWORK_STATUS_CHANGE));
+    //   fireEventListeners(new Event(Event.NETWORK_STATUS_CHANGE));
 
-      this.initializeLongPolling();
-    } catch(InterruptedException e) {
+    //   this.initializeLongPolling();
+    // } catch(InterruptedException e) {
 
-    } catch(ExecutionException e) {
+    // } catch(ExecutionException e) {
       
-    } catch(ParseException e) {
+    // } catch(ParseException e) {
 
-    }
+    // }
   }
 
   public void startTest() {
-    if (roomKey == null || playerId == null) return;
+    // if (roomKey == null || playerId == null) return;
 
-    // Build the request body
-    JSONObject body = new JSONObject();
-    body.put("roomKey", this.roomKey);
-    body.put("playerId", this.playerId);
+    // // Build the request body
+    // JSONObject body = new JSONObject();
+    // body.put("roomKey", this.roomKey);
+    // body.put("playerId", this.playerId);
 
-    // Send a HTTP request to create a room
-    HttpRequest request = HttpRequest.newBuilder(
-      URI.create(BASE_URL + "/api/post/start")
-    )
-      .header("accept", "application/json")
-      .header("content-type", "application/json")
-      .POST(BodyPublishers.ofString(body.toString()))
-      .build();
+    // // Send a HTTP request to create a room
+    // HttpRequest request = HttpRequest.newBuilder(
+    //   URI.create(BASE_URL + "/api/post/start")
+    // )
+    //   .header("accept", "application/json")
+    //   .header("content-type", "application/json")
+    //   .POST(BodyPublishers.ofString(body.toString()))
+    //   .build();
 
-    CompletableFuture<HttpResponse<String>> future = client.sendAsync(request, BodyHandlers.ofString());
+    // CompletableFuture<HttpResponse<String>> future = client.sendAsync(request, BodyHandlers.ofString());
 
-    JSONParser parser = new JSONParser();
+    // JSONParser parser = new JSONParser();
 
-    try {
-      JSONObject result = (JSONObject) parser.parse(future.get().body());
+    // try {
+    //   JSONObject result = (JSONObject) parser.parse(future.get().body());
 
-      if (!((Boolean) result.get("success"))) {
-        return;
-      }
-    } catch(InterruptedException e) {
+    //   if (!((Boolean) result.get("success"))) {
+    //     return;
+    //   }
+    // } catch(InterruptedException e) {
 
-    } catch(ExecutionException e) {
+    // } catch(ExecutionException e) {
       
-    } catch(ParseException e) {
+    // } catch(ParseException e) {
 
-    }
+    // }
   }
 
   public void initializeLongPolling() {
@@ -478,45 +478,45 @@ public class NetworkManager {
    * Disconnect from the room.
    */
   public void exitRoom() {
-    if (this.playerId == null) return;
+    // if (this.playerId == null) return;
 
-    // Send request to exit room
-    // Build the request body
-    JSONObject body = new JSONObject();
-    body.put("playerId", this.playerId);
+    // // Send request to exit room
+    // // Build the request body
+    // JSONObject body = new JSONObject();
+    // // body.put("playerId", this.playerId);
 
-    // Send a HTTP request to create a room
-    HttpRequest request = HttpRequest.newBuilder(
-      URI.create(BASE_URL + "/api/post/exit")
-    )
-      .header("accept", "application/json")
-      .header("content-type", "application/json")
-      .POST(BodyPublishers.ofString(body.toString()))
-      .build();
+    // // Send a HTTP request to create a room
+    // HttpRequest request = HttpRequest.newBuilder(
+    //   URI.create(BASE_URL + "/api/post/exit")
+    // )
+    //   .header("accept", "application/json")
+    //   .header("content-type", "application/json")
+    //   .POST(BodyPublishers.ofString(body.toString()))
+    //   .build();
 
-    CompletableFuture<HttpResponse<String>> future = client.sendAsync(request, BodyHandlers.ofString());
+    // CompletableFuture<HttpResponse<String>> future = client.sendAsync(request, BodyHandlers.ofString());
 
-    JSONParser parser = new JSONParser();
+    // JSONParser parser = new JSONParser();
 
-    try {
-      JSONObject result = (JSONObject) parser.parse(future.get().body());
+    // try {
+    //   JSONObject result = (JSONObject) parser.parse(future.get().body());
 
-      // Remove room key and player ID
-      this.roomKey = null;
-      this.playerId = null;
+    //   // Remove room key and player ID
+    //   this.roomKey = null;
+    //   this.playerId = null;
 
-      this.stopLongPolling();
-      this.stopTestUpdates();
+    //   this.stopLongPolling();
+    //   this.stopTestUpdates();
 
-      // Fire event listeners
-      fireEventListeners(new Event(Event.NETWORK_STATUS_CHANGE));
-    } catch(InterruptedException e) {
+    //   // Fire event listeners
+    //   fireEventListeners(new Event(Event.NETWORK_STATUS_CHANGE));
+    // } catch(InterruptedException e) {
 
-    } catch(ExecutionException e) {
+    // } catch(ExecutionException e) {
       
-    } catch(ParseException e) {
+    // } catch(ParseException e) {
 
-    }
+    // }
 
   }
 
