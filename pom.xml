@@ -7,11 +7,9 @@
   <groupId>dev.bchen.coffeetype</groupId>
   <artifactId>coffeetype</artifactId>
   <version>1.0.0</version>
-  <packaging>jar</packaging>
 
   <name>coffeetype</name>
-  <!-- FIXME change it to the project's website -->
-  <url>https://www.github.com/brendan-ch/coffeetype</url>
+  <url>https://github.com/brendan-ch/coffeetype</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -19,20 +17,12 @@
     <maven.compiler.target>1.7</maven.compiler.target>
   </properties>
 
-  <repositories>
-    <!-- <repository>
-      <id>my-repo2</id>
-      <name>central</name>
-      <url>https://repo1.maven.org/maven2/</url>
-    </repository> -->
-  </repositories>
-
   <dependencies>
     <dependency>
       <groupId>com.googlecode.json-simple</groupId>
       <artifactId>json-simple</artifactId>
       <version>1.1.1</version>
-      <!-- <type>bundle</type> -->
+      <scope>compile</scope>
     </dependency>
 
     <dependency>
@@ -57,28 +47,6 @@
           <version>3.0.2</version>
         </plugin>
         <plugin>
-          <artifactId>maven-assembly-plugin</artifactId>
-          <configuration>
-            <archive>
-              <manifest>
-                <mainClass>dev.bchen.coffeetype.App</mainClass>
-              </manifest>
-            </archive>
-            <descriptorRefs>
-              <descriptorRef>jar-with-dependencies</descriptorRef>
-            </descriptorRefs>
-          </configuration>
-          <executions>
-            <execution>
-              <id>make-assembly</id>
-              <phase>package</phase>
-              <goals>
-                <goal>single</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
           <version>3.8.0</version>
         </plugin>
@@ -88,16 +56,7 @@
         </plugin>
         <plugin>
           <artifactId>maven-jar-plugin</artifactId>
-          <version>3.1.0</version>
-          <configuration>
-            <archive>
-              <manifest>
-                <addClasspath>true</addClasspath>
-                <classpathPrefix>lib/</classpathPrefix>
-                <mainClass>App</mainClass>
-              </manifest>
-            </archive>
-          </configuration>
+          <version>3.0.2</version>
         </plugin>
         <plugin>
           <artifactId>maven-install-plugin</artifactId>
@@ -118,22 +77,5 @@
         </plugin>
       </plugins>
     </pluginManagement>
-    <resources>
-      <resource>
-        <directory>src/main/resources/words</directory>
-        <includes>
-          <include>**/*.txt</include>
-        </includes>
-      </resource>
-      <resource>
-        <directory>src/main/resources/assets</directory>
-        <includes>
-          <include>**/*.png</include>
-          <include>**/*.ttf</include>
-          <include>**/*.html</include>
-        </includes>
-      </resource>
-
-    </resources>
   </build>
 </project>
